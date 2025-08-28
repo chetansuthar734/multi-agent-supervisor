@@ -9,4 +9,4 @@ project -
         
       Also include Generative UI feature for enhance user experience at frontend side
 
-      <img width="1688" height="770" alt="my_graph" src="https://github.com/user-attachments/assets/d2f22167-3dac-471b-8c02-845eced6134c" />
+      <img width="1688" height="770" alt="my_graph" src="https://github.com/chetansuthar734/multi-agent-supervisor/blob/master/static/my_graph.png?raw=true" />
