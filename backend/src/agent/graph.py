@@ -1,5 +1,5 @@
 from typing_extensions import Annotated, Sequence, List, Literal  
-from langchain_core.messages import HumanMessage ,BaseMessage ,RemoveMessage ,SystemMessage
+from langchain_core.messages import HumanMessage ,BaseMessage ,RemoveMessage ,SystemMessage,AIMessage
 from pydantic import BaseModel, Field 
 from langgraph.types import Command 
 from langgraph.graph import StateGraph, START, END, MessagesState
