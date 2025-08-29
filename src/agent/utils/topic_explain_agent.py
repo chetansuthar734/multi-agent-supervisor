@@ -17,7 +17,7 @@ from langgraph.config import get_stream_writer
 
 import time
 
-def summarize_node(state:MessagesState)->MessagesState:
+def topic_explain_node(state:MessagesState)->MessagesState:
     writer =get_stream_writer()
     message = state['messages'][-1].content
     writer('starting summarazing topic.......')
@@ -37,8 +37,8 @@ def summarize_node(state:MessagesState)->MessagesState:
 def explain_build():
 
     builder = StateGraph(MessagesState)
-    builder.add_node("summarize", summarize_node)
+    builder.add_node("topic_explain", topic_explain_node)
 
-    builder.add_edge(START,"summarize")
+    builder.add_edge(START,"topic_explain")
 
     return builder.compile()
