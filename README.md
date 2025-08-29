@@ -8,4 +8,4 @@ project -
 
   Also include Streaming, partial response and generative UI feature for enhance user experience at frontend side
 
-  <img width="1688" height="770" alt="my_graph" src="https://github.com/chetansuthar734/multi-agent-supervisor/blob/master/static/my_graph.png?raw=true" />
+  <img width="1688" height="770" alt="my_graph" src="https://github.com/chetansuthar734/multi-agent-supervisor/blob/master/static/graph_img.png?raw=true" />
