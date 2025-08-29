@@ -8,7 +8,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 
-#  Note: don't import pre compiled graph othervise app run with side effect
+#  Note: don't import pre compiled graph othervise langgraph server app run with side effect and crashing
 
 
 from  agent.utils.cod import code_build
@@ -201,4 +201,4 @@ graph = graph_b.compile()
 
 
 
-graph.get_graph(xray=True).draw_mermaid_png(output_file_path ='graph_img.png')
+# graph.get_graph(xray=True).draw_mermaid_png(output_file_path ='graph_img.png')
