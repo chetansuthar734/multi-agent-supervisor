@@ -1,6 +1,6 @@
-[1].Frontend  use Reactjs app.
+[1].Frontend use Reactjs.
 
 
-[2].langgraph provide useStream hook for communicate to langgraph server api.
-useStream , langgraph sdk(python-sdk,js-sdk) are parts of langgraph platform.
+[2].useStream hook by langgraph for Reactjs app
+useStream hook acts as a bridge, facilitating real-time updates ans maintaining the conversational history and agent state within react application.
 
