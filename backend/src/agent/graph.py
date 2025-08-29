@@ -5,7 +5,7 @@ from langgraph.types import Command
 from langgraph.graph import StateGraph, START, END, MessagesState
 # from IPython.display import Image, display 
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+from langgraph.config import get_stream_writer
 
 
 #  Note: don't import pre compiled graph othervise langgraph server app run with side effect and crashing
@@ -77,9 +77,11 @@ class Supervisor(BaseModel):
 class State(MessagesState):
     agent:List[BaseMessage]
 
-
+import time
 def supervisor_node(state:State) -> Command[Literal["enhancer","code","research","summarize","explain","weather","research_and_report_writer"]]:
-
+    writer = get_stream_writer()
+    writer('supervisor')
+    # time.sleep(2) # only for representation which node invoke cuurently
     print("\n\n\n\n\n\n\n" ,state['messages'][-1] , "\n\n\n\n\n\n")
     system_prompt = ('''
                  
@@ -105,7 +107,10 @@ def supervisor_node(state:State) -> Command[Literal["enhancer","code","research"
     ''')
 
     if not state.get("messages") or not state["messages"][-1].content.strip():
+        writer("please provide information")
+        time.sleep(3)
         return Command(goto=END, update={"messages": [AIMessage(content="Please provide input.")]})
+        # return Command(goto=END,update={})
 
     messages = [SystemMessage(content=system_prompt)] + state["messages"]
     try:

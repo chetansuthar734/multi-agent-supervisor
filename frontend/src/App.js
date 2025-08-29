@@ -8,7 +8,12 @@ import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from "react";
 import "./App.css";
 // import CodeUI from "./component/code_ui"; 
-import { BarLoader } from 'react-css-loaders';
+// import { BarLoader } from 'react-css-loaders'; //not work give error
+
+import { ScaleLoader , BounceLoader, BarLoader} from 'react-spinners'
+import SimpleImageSlider from "react-simple-image-slider";
+
+
 
 {/* <ReactMarkdown>{report}</ReactMarkdown> */}
 
@@ -33,14 +38,19 @@ export default function App() {
     onFinish:(finalevent)=>{
       setPartialResponse("")
       // setFinalMessages(thread.messages); 
+      //state stream after node return state
       console.log(finalevent.values.messages)
       setFinalMessages(finalevent.values.messages); 
       ; // clear partial
       setUser("")
       },
+
       onError:()=>{setPartialResponse("")},
+
     onStop:()=>{ setPartialResponse("")}, 
+
     onCustomEvent: (event, options) => {
+      console.log(event)
        setPartialResponse(event)}    //for custom data stream by get_stream_writer
     
     // onCustomEvent: for custom event handler
@@ -69,10 +79,10 @@ export default function App() {
 {/* when query in history click scrollToViewElement() chat-container element*/}
   <div className="messages">
     {finalMessages
-       .slice()
-       .reverse()
-      .filter((msg) => msg.type === "human" && msg.content.trim() !=='') // only user messages
-      .map((msg) => (
+       ?.slice()
+       ?.reverse()
+      ?.filter((msg) => msg.type === "human" && msg.content.trim() !=='') // only user messages
+      ?.map((msg) => (
         <div key={msg.id}  onClick={()=>{console.log(msg.content); setClicked(!clicked);const  e =document.getElementById(msg.id); e.scrollIntoView({behavior:'smooth',block:'center'})  }} className="user-bubble">
           {msg.content}
         </div>
@@ -96,7 +106,7 @@ export default function App() {
 
         {/* {thread.messages.map((msg) => ( */}
         {/* <CodeUI code='python and javaScript code here' /> */}
-        {finalMessages.map((msg) => ( 
+        {finalMessages?.map((msg) => ( 
 
           
           <div
@@ -126,11 +136,15 @@ export default function App() {
         {/* Live-streaming partial output */}
         {partialResponse && (
           <div className="message bot">
-
+             
             <ReactMarkdown>{partialResponse}</ReactMarkdown>
+            <BarLoader width={200} />
           </div>
         )}
       </div>
+
+
+
 
       {/* Input bar */}
       <form
