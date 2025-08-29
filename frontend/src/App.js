@@ -144,14 +144,11 @@ export default function App() {
 
 
 
-  thread.submit({
-           task:message,
-           revision_numer:1,
-           max_revisions:2,
+  thread.submit({ //values(stateKey):value
           messages:[message]
 
           },
-          {streamMode:["custom"]});
+          {streamMode:["custom"], streamSubgraphs:true });
 
   }}
       >
