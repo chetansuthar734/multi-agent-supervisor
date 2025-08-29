@@ -5,14 +5,14 @@ import json
 from dataclasses import dataclass
 from typing import Any, Dict, TypedDict ,Annotated ,List
 
-from langgraph.graph import StateGraph ,add_messages ,END
+from langgraph.graph import StateGraph ,add_messages ,END , MessagesState
 # from langgraph.runtime import Runtime
 
 from langchain_core.messages import AIMessage, BaseMessage ,ToolMessage ,HumanMessage
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import ToolNode,tools_condition
-from langgraph.types import StreamWriter
+
 from langgraph.config import get_stream_writer
 
 llm = ChatGoogleGenerativeAI(model='gemini-2.0-flash',api_key="AIzaSyDK1CNcAhSrM4qy3UVIXLu7J7Qk2U51Rug")
@@ -45,72 +45,28 @@ def weather_tool(city:str):
 
 
 
-class State(TypedDict):
-   messages:Annotated[List[BaseMessage],add_messages]
-
 
 
 from typing import Dict, Any
 
 from langchain_core.messages import ToolMessage ,SystemMessage
 
-#def tool_node(state: State):
-#     return {
-#         "messages": [
-#             ToolMessage(
-#                 content="Weather update",
-#                 tool_call_id="weather_tool",
-#                 additional_kwargs={
-#                     "city": "raniwara",
-#                     "temperature": 43.4,
-#                     "condition": "foggy",
-#                 }
-#             ),
-
-#             ToolMessage(
-#                 content="Code snippet",
-                # tool_call_id="code_tool",
-                # name="code_tool",
-#                 additional_kwargs={
-#                     "code": "console.log('hello world');",
-#                     "language": "javascript",
-#                 }
-#             )
-#         ]
-#     }
-
-
-#def greet_node(state:State):
-    # print(state['messages'])
-    # return {'messages':[SystemMessage(content='your are helpful assistant with capability web search ,weather forecast')]}
-
-# note : if you add themself AIMessage to  last of State then llm.invoke([Humanmessage(),AIMessage()]) ,llm think answer is generated so it not generate anything
-
-
-
 
 
 tools=[weather_tool]
 tool_map = {'weather_tool':weather_tool}
 
-
-
-
-
 # tool_node = ToolNode(tools=tools)
 
 
-def call_model(state: State ):
+def call_model(state:MessagesState ):
     print('call_agent')
-    # print(state['messages'])
-    response = llm.bind_tools(tools=tools).invoke(state['messages'])
-
-    writer = get_stream_writer()  
-    writer("Fetching weather...")
-    # writer({"type": "progress", "step": 2, "status": "Parsing results"})
+    print("\n\n\n\n\n",state['messages'][-1],"\n\n\n\n\n")
 
 
-    return {'messages':response}
+    response = llm.bind_tools(tools=tools).invoke([state['messages'][-1]])
+
+    return {'messages':[response]}
 
 
 
@@ -118,7 +74,7 @@ def call_model(state: State ):
 
 
 
-def tool_node(state):
+def tool_node(state:MessagesState):
     """custom toolnode handle tool calls from llm generated tool_call request"""
     tool_messages =[]
 
@@ -140,7 +96,7 @@ def tool_node(state):
     return {'messages':tool_messages}
 
 
-def tools_route(state: State) -> Literal['tools', END]:
+def tools_route(state: MessagesState) -> Literal['tools', END]:
     last_ai_message = state['messages'][-1]
     if hasattr(last_ai_message, "tool_calls") and last_ai_message.tool_calls:
         return "tools"
@@ -151,12 +107,13 @@ def tools_route(state: State) -> Literal['tools', END]:
 
 
 def weather_build():
-    return (
-        StateGraph(State)
-        .add_node('call_model',call_model)
-        .add_node('tools',tool_node)
-        .add_edge("__start__", "call_model")
-        .add_conditional_edges('call_model',tools_route)
-        .add_edge('tools','call_model')
-        ).compile(name="New Graph")
+
+    graph_b=StateGraph(MessagesState)
+    graph_b.add_node('call_model',call_model)
+    graph_b.add_node('tools',tool_node)
+    graph_b.add_edge("__start__", "call_model")
+    graph_b.add_conditional_edges('call_model',tools_route)
+    graph_b.add_edge('tools','call_model')
+
+    return graph_b.compile()
 

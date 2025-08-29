@@ -5,7 +5,7 @@ import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-const CodeUI = ({ code, language = "javascript" }) => {
+const CodeUI = ({ code, language , output }) => {
   return (
     <div style={{width:"700px" }} className="rounded-2xl shadow-md bg-gray-900 text-white p-3 my-2 overflow-x-auto">
       <SyntaxHighlighter
@@ -20,6 +20,8 @@ const CodeUI = ({ code, language = "javascript" }) => {
       >
         {code}
       </SyntaxHighlighter>
+
+      <div style={{border:'1px solid white' , padding:'5px'}}>output:{output}</div>
     </div>
   );
 };

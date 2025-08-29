@@ -38,7 +38,7 @@ export default function App() {
 //  console.log('refreshed')
   const thread = useStream({
     // apiUrl: "http://127.0.0.1:8989", 
-    apiUrl: "http://127.0.0.1:5555",
+    apiUrl: "http://127.0.0.1:5556",
     assistantId: "agent",
     messagesKey: "messages",
     onFinish:(finalevent)=>{
@@ -56,7 +56,7 @@ export default function App() {
     onStop:()=>{ setPartialResponse("")}, 
 
     onCustomEvent: (event, options) => {
-      console.log(event)
+      // console.log(event)
        setPartialResponse(event)}    //for custom data stream by get_stream_writer
     
     // onCustomEvent: for custom event handler
@@ -119,29 +119,11 @@ export default function App() {
         {/* {thread.messages.map((msg) => ( */}
         {/* <CodeUI code='python and javaScript code here' /> */}
 
-        {
-        // finalMessages?.map((msg) => ( 
-        //   <div
-        //   key={msg.id}
-        //   id={msg.id}
-        //   className={`message ${msg.type==="human"? "user": "bot"}`}
-        //   >
-        //     {/* <ReactMarkdown>{msg.content}</ReactMarkdown>  */}
-        //   {msg.name==='warning' && msg.type==="ai" && (<div > <ReactMarkdown color={'red'}>{msg.content}</ReactMarkdown> </div>)}
-        //   {msg.type==='human' && ( <ReactMarkdown>{msg.content}</ReactMarkdown> )}
-        //   {msg.type==='ai' && (<ReactMarkdown>{msg.content}</ReactMarkdown>)}
-        //   {msg.name==='weather' && (<div >weather </div>)}
-        //   {msg.name==='images' && (<div >image slider</div>)}
-        //   {msg.name==='report' && (<div >report ui</div>)}
-        //   {msg.name==='code' && (<div >code ui</div>)}
-
-        //   </div>
-        //  ))
-         }
+        
 
 
 
-         {finalMessages?.map((msg) => (
+{finalMessages?.map((msg) => (
   <div
     key={msg.id}
     id={msg.id}
@@ -152,8 +134,8 @@ export default function App() {
         <WarningUI  message={msg.content}/>        {/* <ReactMarkdown>{msg.content}</ReactMarkdown> */}
       </div>
     ) : msg.name === "weather_tool" ? (
- <WeatherUI city="Mumbai" temperature={32} condition="Sunny" />
-      // <WeatherUI city={msg.additional_kwargs['city']}  temperature={msg.additional_kwargs['temperature']} condition={msg.additional_kwargs['condition']} />
+//  <WeatherUI city="Mumbai" temperature={32} condition="Sunny" />
+      <WeatherUI city={msg.additional_kwargs['city']}  temperature={msg.additional_kwargs['temperature']} condition={msg.additional_kwargs['condition']} />
     ) : msg.name === "images" ? ( <div style={{display:"flex" , flexDirection:'row'}}>
    {/* <SimpleImageSlider  /> */}
    <div >
@@ -170,10 +152,8 @@ export default function App() {
       />
     </div> 
           </div>
-    ) : msg.name === "report" ? (
-      <div>report ui</div>
-    ) : msg.name === "code" ? (  
-       <CodeUI code={msg.content} language="javascript" />
+    ): msg.name === "code" ? (  
+       <CodeUI code={msg.content} language={msg.additional_kwargs['language']} output={msg.additional_kwargs['output']} />
     ) : msg.type === "human" ? (
       <ReactMarkdown>{msg.content}</ReactMarkdown>
     ) : msg.type === "ai" ? (
