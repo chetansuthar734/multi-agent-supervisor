@@ -1,0 +1,1 @@
+//code ui show code and output , copy code 
