@@ -200,4 +200,5 @@ graph = graph_b.compile()
 
 
 
-graph.get_graph().draw_mermaid_png("graph_output.png")
+
+graph.get_graph(xray=True).draw_mermaid_png(output_file_path ='graph_img.png')
