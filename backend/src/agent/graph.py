@@ -7,8 +7,11 @@ from langgraph.graph import StateGraph, START, END, MessagesState
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.config import get_stream_writer
 
-
 #  Note: don't import pre compiled graph othervise langgraph server app run with side effect and crashing
+# Python caches modules after the first import. If you modify agent.utils.cod, but don’t restart the kernel or force reload, the old version is used.
+# import importlib
+# import agent.utils.cod
+# importlib.reload(agent.utils.cod)
 
 
 from  agent.utils.cod import code_build
@@ -16,7 +19,7 @@ from  agent.utils.research import research_build
 from  agent.utils.summary_agent import summary_build
 from  agent.utils.topic_explain_agent import explain_build
 from  agent.utils.Research_and_Report_write_agent import research_report_build
-from  agent.utils.weather import weather_build
+from  agent.utils.weather import weather_builder
 
 
 
@@ -186,25 +189,51 @@ def enhancer_node(state:State) -> Command[Literal["supervisor"]]:
 # from  agent.utils.Research_and_Report_write_agent import research_report_build
 # from  agent.utils.weather import  weather_build
 
-graph_b = StateGraph(State, input_schema=MessagesState, output_schema=MessagesState)
-
-graph_b.add_node("supervisor", supervisor_node) 
-graph_b.add_node("enhancer", enhancer_node)  
-
-graph_b.add_node("research",research_build()) 
-graph_b.add_node("research_and_report_writer",research_report_build()) 
-graph_b.add_node("code", code_build()) 
-graph_b.add_node("summarize", summary_build()) 
-graph_b.add_node("explain", explain_build()) 
-graph_b.add_node("weather", weather_build()) 
-
-graph_b.add_edge(START, "supervisor")  
 
 
 
-graph = graph_b.compile()
+
+# graph_bd = StateGraph(State, input_schema=MessagesState, output_schema=MessagesState)
+
+# graph_bd.add_node("supervisor", supervisor_node) 
+# graph_bd.add_node("enhancer", enhancer_node)  
+
+# graph_bd.add_node("research",research_build()) 
+# graph_bd.add_node("research_and_report_writer",research_report_build()) 
+# graph_bd.add_node("code", code_build()) 
+# graph_bd.add_node("summarize", summary_build()) 
+# graph_bd.add_node("explain", explain_build()) 
+# graph_bd.add_node("weather", weather_build()) 
+
+# graph_bd.add_edge(START, "supervisor")  
+
+
+
+# graph = graph_bd.compile()
 
 
 
 
 # graph.get_graph(xray=True).draw_mermaid_png(output_file_path ='graph_img.png')
+graph = None
+
+
+def build_graph():
+    graph_b = StateGraph(State, input_schema=MessagesState, output_schema=MessagesState)
+    graph_b.add_node("supervisor", supervisor_node)
+    graph_b.add_node("enhancer", enhancer_node)
+    graph_b.add_node("research", research_build())
+    graph_b.add_node("research_and_report_writer", research_report_build())
+    graph_b.add_node("code", code_build())
+    graph_b.add_node("summarize", summary_build())
+    graph_b.add_node("explain", explain_build())
+    graph_b.add_node("weather", weather_builder())
+    graph_b.add_edge(START, "supervisor")
+    return graph_b.compile()
+
+
+
+# if __name__ == "__main__":
+    # graph = build_graph()
+
+graph = build_graph()

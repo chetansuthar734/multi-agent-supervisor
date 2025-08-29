@@ -72,7 +72,7 @@ def tool_node(state: State):
         observation = tool.invoke(tool_call["args"])
 
         code.append(ToolMessage(name='code',content=tool_call['args']['code'],additional_kwargs={'output':observation,"language":tool},tool_call_id=tool_call['id']))
-        # print("code",tool_call['args']['code'])
+        print("code",tool_call['args']['code'])
         result.append(ToolMessage(content=observation, tool_call_id=tool_call["id"]))
 
 
@@ -151,7 +151,7 @@ def entry(state: MessagesState) -> State:
 
 def final(state: State) -> MessagesState:
     return {
-        'messages': state['code'] + state['final_response']
+        'messages': state['code']
     }
 
 

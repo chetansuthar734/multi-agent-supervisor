@@ -37,7 +37,7 @@ export default function App() {
 
 //  console.log('refreshed')
   const thread = useStream({
-    // apiUrl: "http://127.0.0.1:8989", 
+
     apiUrl: "http://127.0.0.1:5556",
     assistantId: "agent",
     messagesKey: "messages",

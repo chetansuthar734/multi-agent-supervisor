@@ -64,7 +64,7 @@ def call_model(state:MessagesState ):
     print("\n\n\n\n\n",state['messages'][-1],"\n\n\n\n\n")
 
 
-    response = llm.bind_tools(tools=tools).invoke([state['messages'][-1]])
+    response = llm.bind_tools(tools=tools).invoke(state['messages'])
 
     return {'messages':[response]}
 
@@ -87,10 +87,13 @@ def tool_node(state:MessagesState):
             tool = tool_map[tool_name]
             result = tool.invoke(tool_args)
             
-            data = json.dumps(result)
+            data = result
+            content = f"weather in {data['city']} is {data['condition']}, and temperature is {data['temperature']}"
 
+            print('content' , content)
+            print('result' , result)
             #ToolMessage list
-            tool_message = ToolMessage(content=data,tool_call_id=tool_id,name=tool_name,additional_kwargs=result)
+            tool_message = ToolMessage(content=content,tool_call_id=tool_id,name=tool_name,additional_kwargs=result)
             tool_messages.append(tool_message)
         
     return {'messages':tool_messages}
@@ -106,7 +109,7 @@ def tools_route(state: MessagesState) -> Literal['tools', END]:
 
 
 
-def weather_build():
+def weather_builder():
 
     graph_b=StateGraph(MessagesState)
     graph_b.add_node('call_model',call_model)
