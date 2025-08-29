@@ -200,3 +200,4 @@ graph = graph_b.compile()
 
 
 
+graph.get_graph().draw_mermaid_png("graph_output.png")
