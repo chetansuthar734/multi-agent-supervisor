@@ -7,11 +7,17 @@ import { useStream } from "@langchain/langgraph-sdk/react";
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from "react";
 import "./App.css";
+
+
+import CodeUI from "./component_ui/code";
+import WarningUI from "./component_ui/warning"
+import WeatherUI from "./component_ui/weather"
+import { ScaleLoader , BounceLoader, BarLoader} from 'react-spinners'
+import SimpleImageSlider from "react-simple-image-slider";
+
 // import CodeUI from "./component/code_ui"; 
 // import { BarLoader } from 'react-css-loaders'; //not work give error
 
-import { ScaleLoader , BounceLoader, BarLoader} from 'react-spinners'
-import SimpleImageSlider from "react-simple-image-slider";
 
 
 
@@ -61,6 +67,12 @@ export default function App() {
   
 // });((e)=>{console.log(e)})})
 
+ const sampleImages = [
+    "https://picsum.photos/400/250?random=1",
+    "https://picsum.photos/400/250?random=2",
+    "https://picsum.photos/400/250?random=3",
+  ];
+
   return (<div className="layout">
          {/* <BarLoader /> */}
           <div className="user-query">
@@ -106,20 +118,70 @@ export default function App() {
 
         {/* {thread.messages.map((msg) => ( */}
         {/* <CodeUI code='python and javaScript code here' /> */}
-        {finalMessages?.map((msg) => ( 
 
-          
-          <div
-          key={msg.id}
-          id={msg.id}
-          className={`message ${msg.type==="human"? "user": "bot"}`}
-          >
-            <ReactMarkdown>{msg.content}</ReactMarkdown> 
+        {
+        // finalMessages?.map((msg) => ( 
+        //   <div
+        //   key={msg.id}
+        //   id={msg.id}
+        //   className={`message ${msg.type==="human"? "user": "bot"}`}
+        //   >
+        //     {/* <ReactMarkdown>{msg.content}</ReactMarkdown>  */}
+        //   {msg.name==='warning' && msg.type==="ai" && (<div > <ReactMarkdown color={'red'}>{msg.content}</ReactMarkdown> </div>)}
+        //   {msg.type==='human' && ( <ReactMarkdown>{msg.content}</ReactMarkdown> )}
+        //   {msg.type==='ai' && (<ReactMarkdown>{msg.content}</ReactMarkdown>)}
+        //   {msg.name==='weather' && (<div >weather </div>)}
+        //   {msg.name==='images' && (<div >image slider</div>)}
+        //   {msg.name==='report' && (<div >report ui</div>)}
+        //   {msg.name==='code' && (<div >code ui</div>)}
+
+        //   </div>
+        //  ))
+         }
+
+
+
+         {finalMessages?.map((msg) => (
+  <div
+    key={msg.id}
+    id={msg.id}
+    className={`message ${msg.type === "human" ? "user" : "bot"}`}
+  >
+    {msg.name === "warning" && msg.type === "ai" ? (
+      <div>
+        <WarningUI  message={msg.content}/>        {/* <ReactMarkdown>{msg.content}</ReactMarkdown> */}
+      </div>
+    ) : msg.name === "weather_tool" ? (
+ <WeatherUI city="Mumbai" temperature={32} condition="Sunny" />
+      // <WeatherUI city={msg.additional_kwargs['city']}  temperature={msg.additional_kwargs['temperature']} condition={msg.additional_kwargs['condition']} />
+    ) : msg.name === "images" ? ( <div style={{display:"flex" , flexDirection:'row'}}>
+   {/* <SimpleImageSlider  /> */}
+   <div >
+      <SimpleImageSlider
+        width={500}
+        height={304}
+        images={sampleImages}
+        showBullets={true}
+        showNavs={true}
+        autoPlay={true}
+        autoPlayDelay={2}
+        slideDuration={2}
+
+      />
+    </div> 
           </div>
+    ) : msg.name === "report" ? (
+      <div>report ui</div>
+    ) : msg.name === "code" ? (  
+       <CodeUI code={msg.content} language="javascript" />
+    ) : msg.type === "human" ? (
+      <ReactMarkdown>{msg.content}</ReactMarkdown>
+    ) : msg.type === "ai" ? (
+      <ReactMarkdown>{msg.content}</ReactMarkdown>
+    ) : null}
+  </div>
+))}
 
-
-
-        ))}
 
 
         {/* //user message temp. until receive final state  */}

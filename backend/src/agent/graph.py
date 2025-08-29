@@ -109,12 +109,13 @@ def supervisor_node(state:State) -> Command[Literal["enhancer","code","research"
     if not state.get("messages") or not state["messages"][-1].content.strip():
         writer("please provide information")
         time.sleep(3)
-        return Command(goto=END, update={"messages": [AIMessage(content="Please provide input.")]})
+        return Command(goto=END, update={"messages": [AIMessage(content="Please provide input.",name='warning')]})
         # return Command(goto=END,update={})
 
     messages = [SystemMessage(content=system_prompt)] + state["messages"]
     try:
         response = llm.with_structured_output(Supervisor).invoke(messages)
+        # print("llm response here\n\n\n\n\n\n\nresponse:",response,"\n\n\n\n\n\n\n\n")
     
     except:
         print('\n\n\n\nerror happan\n\n\n\n')

@@ -106,7 +106,7 @@ def call_model(state: State ):
     response = llm.bind_tools(tools=tools).invoke(state['messages'])
 
     writer = get_stream_writer()  
-    writer({"type": "progress","content": "Fetching weather..."})
+    writer("Fetching weather...")
     # writer({"type": "progress", "step": 2, "status": "Parsing results"})
 
 
@@ -130,6 +130,7 @@ def tool_node(state):
             #execute tool
             tool = tool_map[tool_name]
             result = tool.invoke(tool_args)
+            
             data = json.dumps(result)
 
             #ToolMessage list

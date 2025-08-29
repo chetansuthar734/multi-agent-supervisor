@@ -71,7 +71,7 @@ def tool_node(state: State):
         tool = tools_by_name[tool_call["name"]]
         observation = tool.invoke(tool_call["args"])
 
-        code.append(ToolMessage(name = 'code',content=tool_call['args']['code'],additional_kwargs={'output':observation},tool_call_id=tool_call['id']))
+        code.append(ToolMessage(name='code',content=tool_call['args']['code'],additional_kwargs={'output':observation},tool_call_id=tool_call['id']))
         # print("code",tool_call['args']['code'])
         result.append(ToolMessage(content=observation, tool_call_id=tool_call["id"]))
 
