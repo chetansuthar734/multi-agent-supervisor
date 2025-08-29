@@ -1,4 +1,4 @@
-[1].project: Full stack end to end langgraph plateform app
+[1].project: Full stack end to end langgraph plateform multi agent app
 
 
 
