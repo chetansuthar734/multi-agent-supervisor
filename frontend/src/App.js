@@ -38,7 +38,7 @@ export default function App() {
 //  console.log('refreshed')
   const thread = useStream({
 
-    apiUrl: "http://127.0.0.1:5556",
+    apiUrl: "http://127.0.0.1:5558",
     assistantId: "agent",
     messagesKey: "messages",
     onFinish:(finalevent)=>{
@@ -67,11 +67,6 @@ export default function App() {
   
 // });((e)=>{console.log(e)})})
 
- const sampleImages = [
-    "https://picsum.photos/400/250?random=1",
-    "https://picsum.photos/400/250?random=2",
-    "https://picsum.photos/400/250?random=3",
-  ];
 
   return (<div className="layout">
          {/* <BarLoader /> */}
@@ -142,7 +137,7 @@ export default function App() {
       <SimpleImageSlider
         width={500}
         height={304}
-        images={sampleImages}
+        images={msg.additional_kwargs['urls']}
         showBullets={true}
         showNavs={true}
         autoPlay={true}

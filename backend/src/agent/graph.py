@@ -1,4 +1,4 @@
-from typing_extensions import Annotated, Sequence, List, Literal  
+from typing_extensions import Annotated, Sequence, List, Literal  ,TypedDict
 from langchain_core.messages import HumanMessage ,BaseMessage ,RemoveMessage ,SystemMessage,AIMessage
 from pydantic import BaseModel, Field 
 from langgraph.types import Command 
@@ -15,13 +15,15 @@ from langgraph.config import get_stream_writer
 
 
 from  agent.utils.cod import code_build
-from  agent.utils.research import research_build
+from  agent.utils.research import research_builder
 from  agent.utils.summary_agent import summary_build
 from  agent.utils.topic_explain_agent import explain_build
 from  agent.utils.Research_and_Report_write_agent import research_report_build
 from  agent.utils.weather import weather_builder
 
+import os
 
+os.environ['GOOGLE_API_KEY'] ="AIzaSyDK1CNcAhSrM4qy3UVIXLu7J7Qk2U51Rug"
 
 
 # raw dict input need messages handling  , if user use raw dictinary like {"type":"human","content":"query"} then conver dict to BaseMessage
@@ -55,7 +57,7 @@ def convert_dict_to_messages(messages:List)->List[BaseMessage]:
 
 
 
-llm = ChatGoogleGenerativeAI(model='gemini-2.0-flash',api_key="AIzaSyDK1CNcAhSrM4qy3UVIXLu7J7Qk2U51Rug")
+llm = ChatGoogleGenerativeAI(model='gemini-2.0-flash')
 
 
 
@@ -80,12 +82,13 @@ class Supervisor(BaseModel):
 class State(MessagesState):
     agent:List[BaseMessage]
 
+
 import time
-def supervisor_node(state:State) -> Command[Literal["enhancer","code","research","summarize","explain","weather","research_and_report_writer"]]:
+def supervisor_node(state) -> Command[Literal["enhancer","code","research","summarize","explain","weather","research_and_report_writer"]]:
     writer = get_stream_writer()
     writer('supervisor')
     # time.sleep(2) # only for representation which node invoke cuurently
-    print("\n\n\n\n\n\n\n" ,state['messages'][-1] , "\n\n\n\n\n\n")
+    # print("\n\n\n\n\n\n\n" ,state['messages'][-1] , "\n\n\n\n\n\n")
     system_prompt = ('''
                  
         You are a workflow supervisor managing a team of three specialized agents: Prompt Enhancer, Researcher, and Coder. Your role is to orchestrate the workflow by selecting the most appropriate next agent based on the current state and needs of the task. Provide a clear, concise rationale for each decision to ensure transparency in your decision-making process.
@@ -109,20 +112,26 @@ def supervisor_node(state:State) -> Command[Literal["enhancer","code","research"
                  
     ''')
 
-    if not state.get("messages") or not state["messages"][-1].content.strip():
-        writer("please provide information")
-        time.sleep(3)
-        return Command(goto=END, update={"messages": [AIMessage(content="Please provide input.",name='warning')]})
-        # return Command(goto=END,update={})
+    # if not state.get("messages") or not state["messages"][-1].content.strip():
+        # writer("please provide information")
+        # time.sleep(3)
+        # return Command(goto=END, update={"messages": [AIMessage(content="Please provide input.",name='warning')]})
+        # return Command(goto=END)
 
-    messages = [SystemMessage(content=system_prompt)] + state["messages"]
+    messages = [SystemMessage(content=system_prompt)] + state['messages'][-3:] #+ state.get('agent',[])
+
+    print("\n\n\nn\messages\n\n\n\n",messages)
+
     try:
-        response = llm.with_structured_output(Supervisor).invoke(messages)
-        # print("llm response here\n\n\n\n\n\n\nresponse:",response,"\n\n\n\n\n\n\n\n")
+        response = llm.with_structured_output(Supervisor).invoke(messages)   # something fail to force to outcome in structure
+        # response = llm.invoke('pm modi last visit') # something fail to force to outcome in structure
+        # response = llm.bind_tools(tools= [Supervisor],tool_choice='Supervisor').invoke(messages).tool_calls[-1]['args']
+
+        print("llm response here\n\n\n\n\n\n\nresponse:",response,"\n\n\n\n\n\n\n\n")
     
     except:
         print('\n\n\n\nerror happan\n\n\n\n')
-        Command(goto=END , update={"messages":[AIMessage('llm error')]}) 
+        # return Command(goto=END , update={"messages":[AIMessage(content='llm error',name='warning')]}) 
 
     goto = response.next
     reason = response.reason
@@ -131,7 +140,7 @@ def supervisor_node(state:State) -> Command[Literal["enhancer","code","research"
     
     return Command(
         update={
-            "agent": [
+            "messages": [
                 HumanMessage(content=reason, name="supervisor")
             ]
         },
@@ -142,7 +151,7 @@ def supervisor_node(state:State) -> Command[Literal["enhancer","code","research"
 
 
 def enhancer_node(state:State) -> Command[Literal["supervisor"]]:
-
+    print('inside enhancer\n\n\n\n\n\n\n\n')
     """
         Enhancer agent node that improves and clarifies user queries.
         Takes the original user input and transforms it into a more precise,
@@ -160,7 +169,7 @@ def enhancer_node(state:State) -> Command[Literal["supervisor"]]:
     )
 
     messages = [
-        {"role": "system", "content": system_prompt},  
+        SystemMessage(content=system_prompt)  
     ] + state["messages"]  
 
     enhanced_query = llm.invoke(messages)
@@ -170,7 +179,7 @@ def enhancer_node(state:State) -> Command[Literal["supervisor"]]:
 
     return Command(
         update={
-            "agent": [  
+            "messages": [  
                 HumanMessage(
                     content=enhanced_query.content, 
                     name="enhancer"  
@@ -219,10 +228,12 @@ graph = None
 
 
 def build_graph():
-    graph_b = StateGraph(State, input_schema=MessagesState, output_schema=MessagesState)
+    # graph_b = StateGraph(State, input_schema=MessagesState, output_schema=MessagesState)
+    graph_b = StateGraph(State ,input_schema=MessagesState ,output_schema=MessagesState)
     graph_b.add_node("supervisor", supervisor_node)
     graph_b.add_node("enhancer", enhancer_node)
-    graph_b.add_node("research", research_build())
+
+    graph_b.add_node("research", research_builder())
     graph_b.add_node("research_and_report_writer", research_report_build())
     graph_b.add_node("code", code_build())
     graph_b.add_node("summarize", summary_build())
